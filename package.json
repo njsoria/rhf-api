@@ -1,0 +1,33 @@
+{
+  "name": "rhf-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "https": "^1.0.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njsoria/rhf-api.git"
+  },
+  "keywords": [
+    "api",
+    "aws",
+    "lambda",
+    "aws",
+    "api",
+    "gateway",
+    "encompass"
+  ],
+  "author": "Nate Soria",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/njsoria/rhf-api/issues"
+  },
+  "homepage": "https://github.com/njsoria/rhf-api#readme"
+}
