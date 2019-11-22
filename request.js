@@ -1,6 +1,6 @@
 var request = require("request-promise-native");
 
-exports.handler = function(event, context, callback) {
+exports.handler = async (event) => {
 
     // grab the type and auth from the request
     let type = event.queryStringParameters.type;
@@ -14,7 +14,7 @@ exports.handler = function(event, context, callback) {
         getData: function() {
             return request.get({
             "uri": "https://api.elliemae.com/encompass/v1/loans/" + loanID,
-            "json": true,
+            "json": false,
             "headers": {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + auth
@@ -50,4 +50,14 @@ exports.handler = function(event, context, callback) {
         console.log(result);
         return result;
     });
+    
+    let response = {
+    statusCode: 200,
+    headers: {
+        "x-custom-header" : "my custom header value"
+    },
+    body: JSON.stringify({type: event.queryStringParameters.type})
+    };
+    
+    return response;
 }
