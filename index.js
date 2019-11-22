@@ -1,56 +1,63 @@
-'use strict';
-console.log('Loading hello world function');
- 
-exports.handler = async (event) => {
-    let name = "you";
-    let city = 'World';
-    let time = 'day';
-    let day = '';
-    let responseCode = 200;
-    console.log("request: " + JSON.stringify(event));
-    
-    if (event.queryStringParameters && event.queryStringParameters.name) {
-        console.log("Received name: " + event.queryStringParameters.name);
-        name = event.queryStringParameters.name;
-    }
-    
-    if (event.queryStringParameters && event.queryStringParameters.city) {
-        console.log("Received city: " + event.queryStringParameters.city);
-        city = event.queryStringParameters.city;
-    }
-    
-    if (event.headers && event.headers['day']) {
-        console.log("Received day: " + event.headers.day);
-        day = event.headers.day;
-    }
-    
-    if (event.body) {
-        let body = JSON.parse(event.body)
-        if (body.time) 
-            time = body.time;
-    }
- 
-    let greeting = `Good ${time}, ${name} of ${city}.`;
-    if (day) greeting += ` Happy ${day}!`;
+var request = require("request-promise-native");
 
-    let responseBody = {
-        message: greeting,
-        input: event
+exports.handler = async (event) => {
+
+    // grab the type and auth from the request
+    let type = event.queryStringParameters.type;
+    let auth = event.queryStringParameters.auth;
+    let loanID = event.queryStringParameters.loanID;
+
+    // create an object of functions for the main function
+    var getLoanData = {
+        token: null,
+
+        getData: function() {
+            return request.get({
+            "uri": "https://api.elliemae.com/encompass/v1/loans/" + loanID,
+            "json": true,
+            "headers": {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth
+                }
+            })
+            .then(function(response){
+                return JSON.stringify({type: type,
+                            data: response});
+            })
+            .catch(function(err){
+                if (err) throw new Error(err);
+            });
+        },
+
+        postData: function(data) {
+            return request.post({
+                "uri": "https://hooks.zapier.com/hooks/catch/5978432/o4jsk70/",
+                "json": true,
+                "headers": {
+                    'Content-Type': 'application/json'
+                },
+                "body": data
+            });
+        }
+    }
+
+    function main() {
+        return getLoanData.getData()
+            .then(getLoanData.postData);
+    }
+
+    main().then(function(result){
+        console.log(result);
+        return result;
+    });
+    
+    let response = {
+    statusCode: 200,
+    headers: {
+        "x-custom-header" : "some value"
+    },
+    body: JSON.stringify({type: event.queryStringParameters.type})
     };
     
-    // The output from a Lambda proxy integration must be 
-    // in the following JSON object. The 'headers' property 
-    // is for custom response headers in addition to standard 
-    // ones. The 'body' property  must be a JSON string. For 
-    // base64-encoded payload, you must also set the 'isBase64Encoded'
-    // property to 'true'.
-    let response = {
-        statusCode: responseCode,
-        headers: {
-            "x-custom-header" : "my custom header value"
-        },
-        body: JSON.stringify(responseBody)
-    };
-    console.log("response: " + JSON.stringify(response))
     return response;
-};
+}
