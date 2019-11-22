@@ -1,23 +1,45 @@
-// testing out the request from postman to the API
+var request = require("request-promise-native");
 
-var request = require("request");
+let type = 'create';
 
-var options = { method: 'GET',
-  url: 'https://api.elliemae.com/encompass/v1/loans/6842aafb-fb9f-4384-b854-b4fbc24c16d6',
-  headers: 
-   { 'cache-control': 'no-cache',
-     Connection: 'keep-alive',
-     Host: 'api.elliemae.com',
-     'Postman-Token': '5a471a1e-4c4a-4fdb-a18c-b8951aa2d112,bff0b8c8-0e9f-4931-8c98-ce847df6a49b',
-     'Cache-Control': 'no-cache',
-     Accept: '*/*',
-     'User-Agent': 'PostmanRuntime/7.19.0',
-     'Content-Type': 'application/json',
-     Authorization: 'Bearer PcWnuayp5myCB6cubk9paU3p7ehr' } };
+var getLoanData = {
+    token: null,
 
-request(options, function (error, res, body) {
-  if (error) throw new Error(error);
+    getData: function() {
+        return request.get({
+           "uri": "https://api.elliemae.com/encompass/v1/loans/6842aafb-fb9f-4384-b854-b4fbc24c16d6",
+           "json": true,
+           "headers": {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer y716IemHrbjI4PKq6hFfk5tjTKGn'
+            }
+        })
+        .then(function(response){
+            return JSON.stringify({type: type,
+                        data: response});
+        })
+        .catch(function(err){
+            if (err) throw new Error(err);
+        });
+    },
 
-  console.log(`status code: ${res.statusCode}`);
-  console.log(body);
+    postData: function(data) {
+        return request.post({
+            "uri": "https://hooks.zapier.com/hooks/catch/5978432/o4jsk70/",
+            "json": true,
+            "headers": {
+                'Content-Type': 'application/json'
+            },
+            "body": data
+        });
+    }
+}
+
+function main() {
+    return getLoanData.getData()
+        .then(getLoanData.postData);
+}
+
+main().then(function(result){
+    console.log(result);
 });
