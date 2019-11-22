@@ -9,7 +9,6 @@ exports.handler = async (event) => {
 
     // create an object of functions for the main function
     var getLoanData = {
-        token: null,
 
         getData: function() {
             return request.get({
@@ -21,8 +20,8 @@ exports.handler = async (event) => {
                 }
             })
             .then(function(response){
-                return JSON.stringify({type: type,
-                            data: response});
+                return {type: type,
+                            data: response};
             })
             .catch(function(err){
                 if (err) throw new Error(err);
