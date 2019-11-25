@@ -10,6 +10,7 @@ exports.handler = async (event) => {
     let type = event.queryStringParameters.type;
     let auth = event.queryStringParameters.auth;
     let loanID = event.queryStringParameters.loanID;
+    let postURI = event.queryStringParameters.postURI;
 
     // create an object of functions for the main function
     var getLoanData = {
@@ -34,7 +35,7 @@ exports.handler = async (event) => {
 
         postData: function(data) {
             return request.post({
-                "uri": "https://hooks.zapier.com/hooks/catch/5978432/o4jsk70/",
+                "uri": postURI,
                 "json": true,
                 "headers": {
                     'Content-Type': 'application/json'
