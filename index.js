@@ -1,7 +1,11 @@
-var request = require("request-promise-native");
-
 exports.handler = async (event) => {
-
+    
+    var request = require("request-promise-native");
+    
+    if(event.queryStringParameters !== null){
+        console.log(event.queryStringParameters);
+    }
+    
     // grab the type and auth from the request
     let type = event.queryStringParameters.type;
     let auth = event.queryStringParameters.auth;
@@ -44,19 +48,24 @@ exports.handler = async (event) => {
         return getLoanData.getData()
             .then(getLoanData.postData);
     }
+    
+    function test() {
+        return getLoanData.postData();
+    }
 
-    main().then(function(result){
+    return main().then(function(result){
         console.log(result);
-        return result;
+        
+        // setup the api response
+        let response = {
+        statusCode: 200,
+        headers: {
+            "x-custom-header" : "some value"
+        },
+        body: JSON.stringify(result)
+        };
+    
+        // return the response
+        return response;
     });
-    
-    let response = {
-    statusCode: 200,
-    headers: {
-        "x-custom-header" : "some value"
-    },
-    body: JSON.stringify({type: event.queryStringParameters.type})
-    };
-    
-    return response;
 }
